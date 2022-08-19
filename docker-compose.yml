@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  app_server:
+    build:
+      dockerfile: Dockerfile-server
+      context: .
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+    ports:
+      - "50051:50051"
+    entrypoint: /app/grpc-server/grpc-server
+
+  postgres:
+    image: postgres:14.2
+    user: postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "$POSTGRES_USER", "-d", "$POSTGRES_DB" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 4G
+    ports:
+      - "5433:5432"
+
+
+
+
+
+
